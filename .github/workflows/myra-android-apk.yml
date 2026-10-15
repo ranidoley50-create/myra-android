@@ -1,0 +1,58 @@
+name: Build MYRA Android APK
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [main]
+    paths:
+      - "artifacts/myra-assistant/native-android/**"
+      - ".github/workflows/myra-android-apk.yml"
+
+permissions:
+  contents: read
+
+jobs:
+  build-apk:
+    name: Test and build installable APK
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: artifacts/myra-assistant/native-android
+    steps:
+      - name: Check out source
+        uses: actions/checkout@v4
+
+      - name: Install Java 17
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: "17"
+
+      - name: Set up Gradle
+        uses: gradle/actions/setup-gradle@v4
+
+      - name: Install Android SDK
+        uses: android-actions/setup-android@v3
+
+      - name: Install Android build tools
+        run: sdkmanager "platforms;android-35" "build-tools;35.0.0"
+
+      - name: Keep the sideload signing identity stable
+        uses: actions/cache@v4
+        with:
+          path: ~/.android/debug.keystore
+          key: myra-debug-keystore-v1
+
+      - name: Run unit tests
+        run: ./gradlew --no-daemon testDebugUnitTest
+
+      - name: Build debug APK
+        run: ./gradlew --no-daemon assembleDebug
+
+      - name: Upload installable APK
+        uses: actions/upload-artifact@v4
+        with:
+          name: myra-android-debug-apk
+          path: artifacts/myra-assistant/native-android/app/build/outputs/apk/debug/app-debug.apk
+          if-no-files-found: error
+          retention-days: 30
