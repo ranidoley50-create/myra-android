@@ -1,0 +1,24 @@
+kind = "mobile"
+previewPath = "/"
+title = "MYRA"
+description = "A native Android personal assistant with hands-free voice interaction, user-configured AI responses, and phone actions limited to Android's supported permissions and policies."
+version = "1.0.0"
+id = "artifacts/myra-assistant"
+router = "expo-domain"
+
+[[services]]
+name = "expo"
+ensurePreviewReachable = "/status"
+paths = [ "/" ]
+localPort = 25022
+
+[services.development]
+run = "pnpm --filter @workspace/myra-assistant run dev"
+
+[services.production]
+build = [ "pnpm", "--filter", "@workspace/myra-assistant", "run", "build" ]
+run = [ "pnpm", "--filter", "@workspace/myra-assistant", "run", "serve" ]
+
+[services.env]
+PORT = "25022"
+BASE_PATH = "/"
