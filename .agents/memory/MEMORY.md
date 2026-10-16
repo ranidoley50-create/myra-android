@@ -1,0 +1,1 @@
+- [GitHub publishing from Replit](github-publishing.md) — a healthy account connection may still fail in shell; verify the Git pane push and remote refs before claiming GitHub is connected.
